@@ -29,6 +29,7 @@ namespace Flappy_Bird_Game_1
         int gravity = 8;
         bool gameOver;
         Rect flappyBirdHitBox;
+        private object txtScore;
 
         public MainWindow()
         {
@@ -42,7 +43,53 @@ namespace Flappy_Bird_Game_1
 
         private void MainEventTimer(object sender, EventArgs e)
         {
-            
+            scoreText.Content= "Score: " + score;
+
+            flappyBirdHitBox = new Rect(Canvas.GetLeft(flappyBird), Canvas.GetTop(flappyBird), flappyBird.Width - 5, flappyBird.Height);
+
+            Canvas.SetTop(flappyBird, Canvas.GetTop(flappyBird) + gravity);
+
+            if (Canvas.GetTop(flappyBird) < -10 || Canvas.GetTop(flappyBird) > 458)
+            {
+                gameOver = false;
+            }
+
+
+
+            foreach (var x in MyCanvas.Children.OfType<Image>())
+            {
+                if ((string)x.Tag == "obs1" || (string)x.Tag == "obs2" || (string)x.Tag == "obs3")
+                {
+                    Canvas.SetLeft(x, Canvas.GetLeft(x) - 5);
+
+                    if (Canvas.GetLeft(x) < -100)
+                    {
+                        Canvas.SetLeft(x, 800);
+
+                        score += .5;
+                    }
+
+                    Rect pipeHitBox = new Rect(Canvas.GetLeft(x), Canvas.GetTop(x), x.Width, x.Height);
+
+                    if (flappyBirdHitBox.IntersectsWith(pipeHitBox))
+                    {
+                        EndGame();
+                    }
+
+                }
+
+                if ((string)x.Tag == "cloud")
+                {
+                    Canvas.SetLeft(x, Canvas.GetLeft(x) - 2);
+
+                    if (Canvas.GetLeft(x) < -250)
+                    {
+                        Canvas.SetLeft(x, 550);
+                    }
+                }
+            }
+
+
         }
 
         private void KeyIsDown(object sender, KeyEventArgs e)
@@ -71,12 +118,12 @@ namespace Flappy_Bird_Game_1
 
             MyCanvas.Focus();
 
-            int temp = 300;
+            int temp = 200;
 
             score = 0;
 
             gameOver = false;
-            Canvas.SetTop(flappyBird, 190);
+            Canvas.SetTop(flappyBird, 100);
 
             foreach (var x in MyCanvas.Children.OfType<Image>())
             {
@@ -114,7 +161,9 @@ namespace Flappy_Bird_Game_1
 
         private void EndGame()
         {
-
+            gameTimer.Stop();
+            gameOver = true;
+            scoreText.Content += " Game over. Press R to try again";
         }
 
     }
